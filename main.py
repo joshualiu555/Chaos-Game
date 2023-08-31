@@ -1,73 +1,63 @@
-"""
-This program is a simulation of the chaos game, a popular topic in chaos theory and fractal theory. 
-It generates the Sierpinski Triangle using random points. 
-To learn more about this, watch this YouTube video by Numberphile
-https://www.youtube.com/watch?v=kbKtFN71Lfs
-"""
+import pygame
+from random import randint
 
-# import modules
-import pygame, time, random
+NUM_POINTS = int(input("Enter number of points: "))
 
-# input settings
-num_points = int(input("Enter number of points: "))
-fps = int(input("Enter frame rate: "))
-
-# initializes pygame
 pygame.init()
-screen = pygame.display.set_mode((1000, 1000))
+SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Chaos Game Simulation")
-clock = pygame.time.Clock()
 
-# variables
-coordinate_one_x = 500
-coordinate_one_y = 30
-coordinate_two_x = 200
-coordinate_two_y = 370
-coordinate_three_x = 800
-coordinate_three_y = 370
-white = (255, 255, 255)
-black = (0, 0, 0)
-# program loop
+c1x = 500
+c1y = 100
+c2x = 200
+c2y = 400
+c3x = 800
+c3y = 400
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+count = 0
+startx = (int(c1x) + int(c2x)) / 2
+starty = (int(c1y) + int(c2y)) / 2
+
+def reset():
+	global startx, starty, count
+	startx = (int(c1x) + int(c2x)) / 2
+	starty = (int(c1y) + int(c2y)) / 2
+	count = 0
+	pygame.draw.circle(SCREEN, WHITE, (int(c1x), int(c1y)), 1)
+	pygame.draw.circle(SCREEN, WHITE, (int(c2x), int(c2y)), 1)
+	pygame.draw.circle(SCREEN, WHITE, (int(c3x), int(c3y)), 1)
+	pygame.draw.circle(SCREEN, WHITE, (int(startx), int(starty)), 1)
+
+
+reset()
 running = True
 while running:
-	# checks for events
-	clock.tick(fps)
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
 
-	# resets screen
-	screen.fill(black)
+	count += 1
+	if count == NUM_POINTS:
+		SCREEN.fill(BLACK)
+		reset()
 
-	# draws original triangle
-	pygame.draw.circle(screen, white, (int(coordinate_one_x), int(coordinate_one_y)), 1)
-	pygame.draw.circle(screen, white, (int(coordinate_two_x), int(coordinate_two_y)), 1)
-	pygame.draw.circle(screen, white, (int(coordinate_three_x), int(coordinate_three_y)), 1)
+	# randomly selects one of the three starting points as a pivot
+	connecting_point = randint(1, 3)
+	# draws a point between the current points and the pivot
+	if connecting_point == 1:
+		startx = (int(startx) + int(c1x)) / 2
+		starty = (int(starty) + int(c1y)) / 2
+	elif connecting_point == 2:
+		startx = (int(startx) + int(c2x)) / 2
+		starty = (int(starty) + int(c2y)) / 2
+	else:
+		startx = (int(startx) + int(c3x)) / 2
+		starty = (int(starty) + int(c3y)) / 2
 
-	# generates each point
-	start_point_x = (int(coordinate_one_x) + int(coordinate_two_x)) / 2
-	start_point_y = (int(coordinate_one_y) + int(coordinate_two_y)) / 2
-	pygame.draw.circle(screen, white, (int(start_point_x), int(start_point_y)), 1)
-	for i in range(num_points):
-		# randomly generates which point the previous point connects to
-		connecting_point = random.randint(1, 3)
-		if connecting_point == 1:
-			start_point_x = (int(start_point_x) + int(coordinate_one_x)) / 2
-			start_point_y = (int(start_point_y) + int(coordinate_one_y)) / 2
-		elif connecting_point == 2:
-			start_point_x = (int(start_point_x) + int(coordinate_two_x)) / 2
-			start_point_y = (int(start_point_y) + int(coordinate_two_y)) / 2
-		else:
-			start_point_x = (int(start_point_x) + int(coordinate_three_x)) / 2
-			start_point_y = (int(start_point_y) + int(coordinate_three_y)) / 2
+	pygame.draw.circle(SCREEN, WHITE, (int(startx), int(starty)), 1)
 
-		# maintains approximate fps
-		time.sleep(0.5 / fps)
-		# draws the next point
-		pygame.draw.circle(screen, white, (int(start_point_x), int(start_point_y)), 1)
+	pygame.display.flip()
 
-		# updates screen
-		pygame.display.flip()
-
-# quits the program
 pygame.quit()
